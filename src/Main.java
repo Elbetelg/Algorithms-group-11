@@ -99,7 +99,7 @@ public class Main {
      * Standard QuickSort, Quicksort+Insertion, and Hybrid Sort.
      */
     public static void runTable3() {
-        System.out.println("--- Table 3: Performance Comparison - Average of " + NUM_TRIALS + " trials ---");
+        System.out.println("--- Table 3: Quicksort, Quicksort+Insertion, and Hybrid (n = r) - Average of " + NUM_TRIALS + " trials ---");
         int[] ns = {1000000, 2000000};
 
         for (int n : ns) {
