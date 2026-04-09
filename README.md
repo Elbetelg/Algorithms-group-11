@@ -1,6 +1,6 @@
 # Project README: Improving Counting Sort via Data Locality
 
-This project implements and evaluates the cache-friendly hybrid sorting algorithm proposed by Mahmud and Haque (2022). The goal is to demonstrate how preprocessing data with Quicksort can improve the performance of Counting Sort by inducing data locality.
+This project implements and evaluates the cache-friendly hybrid sorting algorithm proposed by Shamsed Mahmud,Sardar Anisul Haque, and Nazim Choudhury (2022). The goal is to demonstrate how preprocessing data with Quicksort can improve the performance of Counting Sort by inducing data locality.
 
 ## 1. Project Components
 The implementation consists of the following Java classes:
