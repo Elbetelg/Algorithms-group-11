@@ -18,7 +18,7 @@ public class Main {
     public static void runTable1() {
         System.out.println("--- Table 1: Counting Sort (Random vs. Sorted) ---");
         int[] ns = {1000000, 2000000, 3000000};
-        CountingSort cs = new CountingSort();3
+        CountingSort cs = new CountingSort();
 
         for (int n : ns) {
             int[] randomData = generateRandomArray(n, n);
