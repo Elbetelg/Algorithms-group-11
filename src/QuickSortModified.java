@@ -1,7 +1,16 @@
+import java.util.*;
+
 public class QuickSortModified {
+    public List<Partition> partitions = new ArrayList<>();
+
     public void quicksort_modified(int[] arr, int low, int high, int maxValue, int minValue, int C) {
         // The threshold check: Stop recursion if (Range + Size) <= C
-        if ((high - low) > 0 && (maxValue - minValue + (high - low)) > C) {
+        if ((maxValue - minValue + (high - low)) <= C) {
+
+            partitions.add(new Partition(low, high, minValue, maxValue));
+            return;
+        }
+        if(low < high){
 
             // 1. Median-of-Three Pivot Selection
             int pivotIndex = partition(arr, low, high);

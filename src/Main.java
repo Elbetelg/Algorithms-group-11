@@ -76,17 +76,20 @@ public class Main {
                 long startPre = System.nanoTime();
                 int max = CountingSort.getMax(data);
                 int min = CountingSort.getMin(data);
+                qsMod.partitions.clear();
                 qsMod.quicksort_modified(data, 0, n - 1, max, min, C);
-                totalPre = (System.nanoTime() - startPre) / 1_000_000.0;
+                totalPre += (System.nanoTime() - startPre) / 1_000_000.0;
 
                 long startCount = System.nanoTime();
-                cs.countingSort(data, n);
-                totalCount = (System.nanoTime() - startCount) / 1_000_000.0;
+                for (Partition p : qsMod.partitions) {
+                    CountingSort.countingSortRange(data, p.low, p.high, p.min, p.max);
+                }
+                totalCount += (System.nanoTime() - startCount) / 1_000_000.0;
 
                 // T2: Classic Counting Sort
                 long startT2 = System.nanoTime();
                 cs.countingSort(dataClone, n);
-               totalClassic = (System.nanoTime() - startT2) / 1_000_000.0;
+               totalClassic += (System.nanoTime() - startT2) / 1_000_000.0;
             }
             System.out.printf("n=%d, r=%d | T1 (Hybrid Avg): %.2f+%.2f ms | T2 (Classic Avg): %.2f ms\n",
                     n, r, totalPre / NUM_TRIALS, totalCount / NUM_TRIALS, totalClassic / NUM_TRIALS);
@@ -114,19 +117,19 @@ public class Main {
                 int[] qsData = data.clone();
                 long startT1 = System.nanoTime();
                 new QuickSort().sort(qsData, 0, n - 1);
-                totalT1 = (System.nanoTime() - startT1) / 1_000_000.0;
+                totalT1 += (System.nanoTime() - startT1) / 1_000_000.0;
 
                 // T2: Quicksort + Insertion Sort
                 int[] dataT2 = data.clone();
                 long startT2 = System.nanoTime();
                 new QuickSortInsertion().sort(dataT2, 0, n - 1);
-                totalT2 = (System.nanoTime() - startT2) / 1_000_000.0;
+                totalT2 += (System.nanoTime() - startT2) / 1_000_000.0;
 
                 // T3: Proposed Hybrid Sort
                 int[] hybridData = data.clone();
                 long startT3 = System.nanoTime();
                 hybridSort(hybridData, n, C);
-                totalT3 = (System.nanoTime() - startT3) / 1_000_000.0;
+                totalT3 += (System.nanoTime() - startT3) / 1_000_000.0;
             }
             System.out.printf("n=r=%d | T1 (QS): %.2f ms | T2 (QS+Ins): %.2f ms | T3 (Hybrid): %.2f ms\n",
                     n, totalT1 / NUM_TRIALS, totalT2 / NUM_TRIALS, totalT3 / NUM_TRIALS);
@@ -138,12 +141,18 @@ public class Main {
         CountingSort cs = new CountingSort();
         int max = CountingSort.getMax(arr);
         int min = CountingSort.getMin(arr);
+
+        qsMod.partitions.clear();
         qsMod.quicksort_modified(arr, 0, n - 1, max, min, C);
-        cs.countingSort(arr, n);
+
+        // counting sort  applied per partition
+        for (Partition p : qsMod.partitions) {
+            CountingSort.countingSortRange(arr, p.low, p.high, p.min, p.max);
+        }
     }
 
     private static int[] generateRandomArray(int n, int range) {
-        Random rd = new Random();
+        Random rd = new Random(42);
         int[] arr = new int[n];
         for (int i = 0; i < n; i++) arr[i] = rd.nextInt(range);
         return arr;
