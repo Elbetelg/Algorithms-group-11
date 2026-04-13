@@ -5,6 +5,7 @@ public class Main {
     // Threshold C from paper
     private static final int C = 1000;
     private static final int NUM_TRIALS = 10;
+    private static final Random rd = new Random(42);
 
     public static void main(String[] args) {
         System.out.println("Warming up JVM...");
@@ -33,8 +34,7 @@ public class Main {
             double totalT2 = 0;
             for (int i = 0; i < NUM_TRIALS; i++) {
                 int[] randomData = generateRandomArray(n, n);
-                int[] sortedData = randomData.clone();
-                Arrays.sort(sortedData);
+                int[] sortedData = generateSortedArray(n);
 
                 // T1: Random
                 long start = System.nanoTime();
@@ -151,10 +151,15 @@ public class Main {
         }
     }
 
-    private static int[] generateRandomArray(int n, int range) {
-        Random rd = new Random(42);
+    private static int[] generateRandomArray(int n,int range) {
         int[] arr = new int[n];
         for (int i = 0; i < n; i++) arr[i] = rd.nextInt(range);
+        return arr;
+    }
+
+    private static int[] generateSortedArray(int n) {
+        int[] arr = new int[n];
+        for (int i = 0; i < n; i++) arr[i] = i * (1000000 / n); // Linearly increasing
         return arr;
     }
 }
