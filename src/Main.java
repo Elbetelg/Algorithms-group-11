@@ -4,8 +4,9 @@ import java.util.Arrays;
 public class Main {
     // Threshold C from paper
     private static final int C = 1000;
-    private static final int NUM_TRIALS = 10;
+    private static final int NUM_TRIALS = 20;
     private static final Random rd = new Random(42);
+
 
     public static void main(String[] args) {
         System.out.println("Warming up JVM...");
@@ -56,11 +57,14 @@ public class Main {
      * TABLE 2: Counting Sort with/without Preprocessing (Worst Case r >> n)
      * Proves that Quicksort preprocessing helps when data is scattered.
      */
+
     public static void runTable2() {
         System.out.println("--- Table 2: Preprocessing vs. No Preprocessing - Average of " + NUM_TRIALS + " trials ---");
+
         int[] ns = {1000, 2000, 3000};
-        int r = 1000000;
-        QuickSortModified qsMod = new QuickSortModified();
+        int r = 1_000_000;
+        int INNER_REPS = 200;
+
         CountingSort cs = new CountingSort();
 
         for (int n : ns) {
@@ -69,30 +73,48 @@ public class Main {
             double totalClassic = 0;
 
             for (int i = 0; i < NUM_TRIALS; i++) {
-                int[] data = generateRandomArray(n, r);
-                int[] dataClone = data.clone();
-
-                // T1: Hybrid (Timing steps separately as in paper)
-                long startPre = System.nanoTime();
-                int max = CountingSort.getMax(data);
-                int min = CountingSort.getMin(data);
-                qsMod.partitions.clear();
-                qsMod.quicksort_modified(data, 0, n - 1, max, min, C);
-                totalPre += (System.nanoTime() - startPre) / 1_000_000.0;
-
-                long startCount = System.nanoTime();
-                for (Partition p : qsMod.partitions) {
-                    CountingSort.countingSortRange(data, p.low, p.high, p.min, p.max);
+                int[][] baseCases = new int[INNER_REPS][];
+                for (int k = 0; k < INNER_REPS; k++) {
+                    baseCases[k] = generateRandomArray(n, r);
                 }
-                totalCount += (System.nanoTime() - startCount) / 1_000_000.0;
 
-                // T2: Classic Counting Sort
-                long startT2 = System.nanoTime();
-                cs.countingSort(dataClone, n);
-               totalClassic += (System.nanoTime() - startT2) / 1_000_000.0;
+                // T1: Hybrid (measure preprocessing and counting separately)
+                for (int k = 0; k < INNER_REPS; k++) {
+                    int[] data = baseCases[k].clone();
+                    QuickSortModified qsMod = new QuickSortModified();
+
+                    int max = CountingSort.getMax(data);
+                    int min = CountingSort.getMin(data);
+
+                    long startPre = System.nanoTime();
+                    qsMod.quicksort_modified(data, 0, n - 1, max, min, C);
+                    totalPre += (System.nanoTime() - startPre) / 1_000_000.0;
+
+                    long startCount = System.nanoTime();
+                    for (Partition p : qsMod.partitions) {
+                        CountingSort.countingSortRange(data, p.low, p.high, p.min, p.max);
+                    }
+                    totalCount += (System.nanoTime() - startCount) / 1_000_000.0;
+                }
+
+                // T2: Classic Counting Sort on the same inputs
+                long startClassic = System.nanoTime();
+                for (int k = 0; k < INNER_REPS; k++) {
+                    int[] dataClone = baseCases[k].clone();
+                    cs.countingSort(dataClone, n);
+                }
+                totalClassic += (System.nanoTime() - startClassic) / 1_000_000.0;
             }
-            System.out.printf("n=%d, r=%d | T1 (Hybrid Avg): %.2f+%.2f ms | T2 (Classic Avg): %.2f ms\n",
-                    n, r, totalPre / NUM_TRIALS, totalCount / NUM_TRIALS, totalClassic / NUM_TRIALS);
+
+            double denom = NUM_TRIALS * INNER_REPS;
+
+            System.out.printf(
+                    "n=%d, r=%d | T1 (Hybrid Avg): %.2f+%.2f ms | T2 (Classic Avg): %.2f ms%n",
+                    n, r,
+                    totalPre / denom,
+                    totalCount / denom,
+                    totalClassic / denom
+            );
         }
         System.out.println();
     }
