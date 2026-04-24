@@ -1,10 +1,10 @@
 public class QuickSort {
     // 1. Rename this from 'swap' to 'sort'
-    void sort(int a[], int l, int h) {
-        if (l < h) {
-            int pi = partition(a, l, h);
-            sort(a, l, pi - 1);
-            sort(a, pi + 1, h);
+    void sort(int arr[], int low, int high) {
+        if (low < high) {
+            int pi = partition(arr, low, high);
+            sort(arr, low, pi - 1);
+            sort(arr, pi + 1, high);
         }
     }
 

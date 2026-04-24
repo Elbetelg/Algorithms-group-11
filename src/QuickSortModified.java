@@ -4,24 +4,25 @@ public class QuickSortModified {
     public List<Partition> partitions = new ArrayList<>();
 
     public void quicksort_modified(int[] arr, int low, int high, int maxValue, int minValue, int C) {
-        // The threshold check: Stop recursion if (Range + Size) <= C
-        if ((maxValue - minValue + (high - low)) <= C) {
+        // Base case: single element is always a valid leaf partition
+        if (low >= high) {
+            if (low == high) partitions.add(new Partition(low, high, arr[low], arr[low]));
+            return;
+        }
 
+        // Threshold check: if (range + size) <= C, this chunk is cache-friendly enough
+        if ((maxValue - minValue + (high - low)) <= C) {
             partitions.add(new Partition(low, high, minValue, maxValue));
             return;
         }
-        if(low < high){
 
-            // 1. Median-of-Three Pivot Selection
-            int pivotIndex = partition(arr, low, high);
-            int midValue = arr[pivotIndex];
+        // 1. Median-of-Three Pivot Selection
+        int pivotIndex = partition(arr, low, high);
+        int midValue = arr[pivotIndex];
 
-            // 2. Recursive calls for sub-partitions
-            quicksort_modified(arr, low, pivotIndex - 1, midValue, minValue, C);
-            quicksort_modified(arr, pivotIndex + 1, high, maxValue, midValue, C);
-        }
-        // If the condition fails, we stop. This leaves the array "partially sorted"
-        // in cache-friendly clusters.
+        // 2. Recursive calls for sub-partitions
+        quicksort_modified(arr, low, pivotIndex - 1, midValue, minValue, C);
+        quicksort_modified(arr, pivotIndex + 1, high, maxValue, midValue, C);
     }
 
     // Standard partition logic using Median-of-Three
